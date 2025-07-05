@@ -40,7 +40,7 @@ describe('Scenarios where authentication is a pre-condition', () => {
   // npx cypress open --config viewportWidth=767,viewportHeight=480
   it('logout', { tags: '@desktop-and-tablet' }, () => { // tag para definir que os testes serao executados apenas com viewport desktop e tablet. Equivale a uma etiqueta para o teste
     cy.visit('/')
-    cy.wait(2000)
+    cy.wait('@getNotes')
 
     cy.contains('.nav a', 'Logout').click() // procura o elemento 'a' dentro da classe nav com o texto Logout e clica nele
 
