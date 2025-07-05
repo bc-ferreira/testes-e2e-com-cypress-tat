@@ -38,7 +38,7 @@ describe('Scenarios where authentication is a pre-condition', () => {
 
   // Comando para executar os testes com viewport menor e customizado
   // npx cypress open --config viewportWidth=767,viewportHeight=480
-  it('logout', () => {
+  it('logout', { tags: '@desktop-and-tablet' }, () => { // tag para definir que os testes serao executados apenas com viewport desktop e tablet. Equivale a uma etiqueta para o teste
     cy.visit('/')
     cy.wait('@getNotes')
 
