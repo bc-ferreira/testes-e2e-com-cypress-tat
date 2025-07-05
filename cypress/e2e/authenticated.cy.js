@@ -1,3 +1,4 @@
+/// <reference path="../support/commands.d.ts" />
 import {faker} from '@faker-js/faker/locale/en' // usar o faker somente com uma linguagem para melhora de performance
 
 describe('Scenarios where authentication is a pre-condition', () => {
