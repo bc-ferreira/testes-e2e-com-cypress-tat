@@ -1,0 +1,81 @@
+# Define um nome amigável para o workflow, exibido na aba de Actions do GitHub
+name: ci  # Workflow de Integração Contínua (CI)
+
+# Gatilhos que disparam este workflow
+on:
+  # Dispara o workflow sempre que houver um push na branch principal
+  push:
+    branches:
+      - main  # Apenas na branch 'main'
+  # Dispara o workflow para eventos de pull request (abertura, atualização, reabertura)
+  pull_request:
+
+jobs:
+  # ==== Job 1: Análise de código com ESLint ====
+  eslint:
+    # Especifica o sistema operacional e imagem do runner
+    runs-on: ubuntu-22.04  # Runner oficial do GitHub baseado em Ubuntu 22.04
+
+    steps:
+      # 1) Clona o repositório para o ambiente de execução deste job
+      - name: Checkout do repositório
+        uses: actions/checkout@v3  # Ação oficial que realiza git clone
+
+      # 2) Instala todas as dependências do projeto listadas em package.json
+      - name: Instalar dependências
+        run: npm install  # Equivalente a 'npm ci' ou 'npm install'
+
+      # 3) Executa o ESLint para verificar padrões, erros de sintaxe e estilo
+      - name: Executar ESLint
+        run: npm run lint  # Deve estar configurado em package.json (ex: "lint": "eslint .")
+        # Se o ESLint encontrar problemas, este job falhará e bloqueará os próximos jobs dependentes
+
+  # ==== Job 2: Testes E2E Cypress – Viewport Desktop ====
+  cypress-tests-desktop:
+    # Garante que este job só rode se o 'eslint' passar sem erros
+    needs: eslint
+    # Mesmo SO para consistência nos runners
+    runs-on: ubuntu-22.04
+
+    steps:
+      # 1) Cada job usa workspace isolado, portanto é preciso novo checkout
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      # 2) Executa testes end-to-end do Cypress em viewport de desktop
+      - name: Rodar testes Cypress no desktop 🧪
+        uses: cypress-io/github-action@v5  # Ação oficial do Cypress no GitHub Actions
+
+        # Variáveis de ambiente para autenticação e Mailosaur (e-mail de teste)
+        env:
+          CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL }}              # E-mail de login nos testes
+          CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }}        # Senha de login nos testes
+          CYPRESS_MAILOSAUR_SERVER_ID: ${{ secrets.CYPRESS_MAILOSAUR_SERVER_ID }}  # ID do servidor Mailosaur
+          CYPRESS_MAILOSAUR_API_KEY: ${{ secrets.CYPRESS_MAILOSAUR_API_KEY }}      # Chave de API Mailosaur
+
+        with:
+          # Comando definido em package.json para rodar todos os testes (desktop)
+          command: npm test
+
+  # ==== Job 3: Testes E2E Cypress – Viewport Tablet ====
+  cypress-tests-tablet:
+    needs: eslint  # Também depende do sucesso do lint
+    runs-on: ubuntu-22.04
+
+    steps:
+      # 1) Novo checkout para este job isolado
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      # 2) Executa testes Cypress em viewport de tablet
+      - name: Rodar testes Cypress no tablet 🧪
+        uses: cypress-io/github-action@v5
+
+        # Credenciais para autenticação nos testes (sem Mailosaur, se não for necessário)
+        env:
+          CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL }}       # E-mail de login
+          CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }} # Senha de login
+
+        with:
+          # Comando definido em package.json para testes no modo tablet
+          command: npm run test:tablet
