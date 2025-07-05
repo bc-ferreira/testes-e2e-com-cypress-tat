@@ -52,10 +52,11 @@ jobs:
           CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }}        # Senha de login nos testes
           CYPRESS_MAILOSAUR_SERVER_ID: ${{ secrets.CYPRESS_MAILOSAUR_SERVER_ID }}  # ID do servidor Mailosaur
           CYPRESS_MAILOSAUR_API_KEY: ${{ secrets.CYPRESS_MAILOSAUR_API_KEY }}      # Chave de API Mailosaur
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }} # Chave de gravação
 
         with:
           # Comando definido em package.json para rodar todos os testes (desktop)
-          command: npm test
+          command: npm run test:cloud
 
   # ==== Job 3: Testes E2E Cypress – Viewport Tablet ====
   cypress-tests-tablet:
@@ -75,7 +76,8 @@ jobs:
         env:
           CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL }}       # E-mail de login
           CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD }} # Senha de login
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
 
         with:
           # Comando definido em package.json para testes no modo tablet
-          command: npm run test:tablet
+          command: npm run test:tablet:cloud

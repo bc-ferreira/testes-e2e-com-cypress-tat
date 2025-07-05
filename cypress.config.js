@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 
 module.exports = defineConfig({
+  projectId: 'eyfz9h',
   e2e: {
     baseUrl: 'https://notes-serverless-app.com',
     defaultCommandTimeout: 10000,
@@ -8,9 +9,6 @@ module.exports = defineConfig({
     chromeWebSecurity: false,
     env: {
       viewportWidthBreakpoint: 768,
-    },
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
     },
   },
 })
